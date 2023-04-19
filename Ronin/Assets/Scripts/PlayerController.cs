@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour
             rb.velocity = Vector2.up * jumpForce;
             animator.SetTrigger("Jump");
         }
+        animator.SetFloat("yVelocity", rb.velocity.y);
     }
 
     private void FixedUpdate()
