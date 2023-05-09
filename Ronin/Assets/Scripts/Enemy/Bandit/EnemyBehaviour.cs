@@ -27,7 +27,7 @@ public class EnemyBehaviour : MonoBehaviour
     private Rigidbody2D rb;
     #endregion
 
-    private void Awake()
+    void Start()
     {
         SelectTarget();
         intTimer = timer;
@@ -85,9 +85,8 @@ public class EnemyBehaviour : MonoBehaviour
         anim.SetBool("canWalk", true);
         if (!anim.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
         {
-            Vector2 targetPosition = new Vector2(target.position.x, transform.position.y);
-
-            transform.position = Vector2.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+            Vector2 direction = (target.position - transform.position).normalized;
+            rb.velocity = new Vector2(direction.x * moveSpeed, rb.velocity.y);
         }
     }
 
@@ -100,6 +99,13 @@ public class EnemyBehaviour : MonoBehaviour
         anim.SetBool("Attack", true);
     }
 
+    void StopAttack()
+    {
+        cooling = false;
+        attackMode = false;
+        anim.SetBool("Attack", false);
+    }
+
     void CoolDown()
     {
         timer -= Time.deltaTime;
@@ -109,13 +115,6 @@ public class EnemyBehaviour : MonoBehaviour
             cooling = false;
             timer = intTimer;
         }
-    }
-
-    void StopAttack()
-    {
-        cooling = false;
-        attackMode = false;
-        anim.SetBool("Attack", false);
     }
 
     public void TriggerCooling()
@@ -133,14 +132,7 @@ public class EnemyBehaviour : MonoBehaviour
         float distanceToLeft = Vector2.Distance(transform.position, leftLimit.position);
         float distanceToRight = Vector2.Distance(transform.position, rightLimit.position);
 
-        if (distanceToLeft > distanceToRight)
-        {
-            target = leftLimit;
-        }    
-        else
-        {
-            target = rightLimit;
-        }
+        target = (distanceToLeft > distanceToRight) ? leftLimit : rightLimit;
 
         Flip();
     }
